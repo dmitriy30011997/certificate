@@ -1,12 +1,13 @@
 package com.example.sertificates;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CertificateService {
 
     private final CertificateRepository certificateRepository;
-
+    @Autowired
     public CertificateService(CertificateRepository certificateRepository) {
         this.certificateRepository = certificateRepository;
     }
