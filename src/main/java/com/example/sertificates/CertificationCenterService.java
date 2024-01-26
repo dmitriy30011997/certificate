@@ -47,4 +47,8 @@ public class CertificationCenterService {
             return false;
         }
     }
+    public String decryptPublicKey(String encryptedPublicKey) {
+        // Расшифровка закрытого ключа
+        return "DecryptedPublicKey";
+    }
 }

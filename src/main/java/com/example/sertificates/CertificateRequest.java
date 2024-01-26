@@ -4,7 +4,6 @@ public class CertificateRequest {
 
     private String username;
     private String encryptedPublicKey;
-    private String otherData;
     private String publicKey;
     private String signature;
 
@@ -24,13 +23,6 @@ public class CertificateRequest {
         this.encryptedPublicKey = encryptedPublicKey;
     }
 
-    public String getOtherData() {
-        return otherData;
-    }
-
-    public void setOtherData(String otherData) {
-        this.otherData = otherData;
-    }
 
     public String getPublicKey() {
         return publicKey;
