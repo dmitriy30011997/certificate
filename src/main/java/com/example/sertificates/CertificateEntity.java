@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+
 @Entity
 public class CertificateEntity {
 
@@ -17,11 +18,7 @@ public class CertificateEntity {
     private String username;
 
     @Column
-    private String certificate;
-
-    public CertificateEntity() {
-
-    }
+    private String publicKey;
 
     public Long getId() {
         return id;
@@ -39,11 +36,11 @@ public class CertificateEntity {
         this.username = username;
     }
 
-    public String getCertificate() {
-        return certificate;
+    public String getPublicKey() {
+        return publicKey;
     }
 
-    public void setCertificate(String certificate) {
-        this.certificate = certificate;
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 }
