@@ -3,18 +3,19 @@ package com.example.certificates;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import java.security.KeyFactory;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 
 @Service
@@ -23,32 +24,35 @@ public class CertificationCenterService {
 
     private final CertificateService certificateService;
 
-    @Value("${certificate.privateKey}")
-    private String privateKeyString;
+    @Value("${keystore.path}")
+    private Resource keystoreResource;
 
-    @Value("${certificate.publicKey}")
-    private String publicKeyString;
+    @Value("${keystore.password}")
+    private String keystorePassword;
+
+    @Value("${certificateFilePath}")
+    private static String certificateFilePath;
 
     @Autowired
     public CertificationCenterService(CertificateService certificateService) {
         this.certificateService = certificateService;
     }
 
-    private PublicKey getPublicKey() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
-        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyString);
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
-        return keyFactory.generatePublic(keySpec);
+    private PrivateKey getPrivateKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try (InputStream inputStream = keystoreResource.getInputStream()) {
+            keyStore.load(inputStream, keystorePassword.toCharArray());
+        }
+        return (PrivateKey) keyStore.getKey("privateKeyAlias", keystorePassword.toCharArray());
     }
 
-
-    private PrivateKey getPrivateKey() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA", "BC");
-        byte[] privateKeyBytes = Base64.getDecoder().decode(privateKeyString);
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
-        return keyFactory.generatePrivate(keySpec);
+    private PublicKey getPublicKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        try (InputStream inputStream = keystoreResource.getInputStream()) {
+            keyStore.load(inputStream, keystorePassword.toCharArray());
+        }
+        Certificate certificate = keyStore.getCertificate("publicKeyAlias");
+        return certificate.getPublicKey();
     }
 
     public boolean verifyJwtToken(String token) {
@@ -67,7 +71,7 @@ public class CertificationCenterService {
             PrivateKey privateKey = getPrivateKey();
             return Jwts.builder()
                     .setSubject(username)
-                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 час
+                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
                     .signWith(privateKey, SignatureAlgorithm.RS256)
                     .compact();
         } catch (Exception e) {
@@ -75,11 +79,18 @@ public class CertificationCenterService {
             return null;
         }
     }
-    //посмотреть какое исключение
-    public boolean verifyCertificate() throws Exception {
-        // Верификация сертификата должна быть с использованием публичного ключа
-        //String publicKey = certificate.getPublicKey();
-        // Логика верификации...
-        return true;
+    public static boolean verifyCertificate(String publicKeyString) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
+
+            PublicKey publicKeyFromCert = certificate.getPublicKey();
+
+            return publicKeyFromCert.toString().equals(publicKeyString);
+        } catch (Exception e) {
+            log.error("Certificate verification failed", e);
+            return false;
+        }
     }
 }

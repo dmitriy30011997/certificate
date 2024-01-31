@@ -17,15 +17,6 @@ public class CertificateService {
         this.certificateRepository = certificateRepository;
     }
 
-    public void createCertificate(String username, String publicKey) {
-        CertificateEntity certificateEntity = new CertificateEntity();
-        certificateEntity.setUsername(username);
-        certificateEntity.setPublicKey(publicKey);
-        certificateRepository.save(certificateEntity);
-
-        log.info("Certificate created for user {}", username);
-    }
-
     public Optional<CertificateEntity> getCertificateByUsername(String username) {
         return certificateRepository.findByUsername(username);
     }
