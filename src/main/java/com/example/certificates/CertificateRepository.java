@@ -1,4 +1,4 @@
-package com.example.sertificates;
+package com.example.certificates;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

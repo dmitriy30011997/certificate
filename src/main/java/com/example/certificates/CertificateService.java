@@ -1,12 +1,17 @@
-package com.example.sertificates;
+package com.example.certificates;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
+@Slf4j
 public class CertificateService {
 
     private final CertificateRepository certificateRepository;
+
     @Autowired
     public CertificateService(CertificateRepository certificateRepository) {
         this.certificateRepository = certificateRepository;
@@ -17,11 +22,11 @@ public class CertificateService {
         certificateEntity.setUsername(username);
         certificateEntity.setPublicKey(publicKey);
         certificateRepository.save(certificateEntity);
+
+        log.info("Certificate created for user {}", username);
     }
 
-    public String getCertificate(String username) {
-        return certificateRepository.findByUsername(username)
-                .map(CertificateEntity::getPublicKey)
-                .orElse("Certificate not found");
+    public Optional<CertificateEntity> getCertificateByUsername(String username) {
+        return certificateRepository.findByUsername(username);
     }
 }
