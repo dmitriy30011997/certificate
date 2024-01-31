@@ -1,12 +1,9 @@
-package com.example.sertificates;
+package com.example.certificates;
 
-import com.example.certificates.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/certificates")
@@ -26,9 +23,9 @@ public class CertificateController {
     @PostMapping
     public ResponseEntity<String> createToken(@RequestBody CertificateRequest request) {
         try {
-            Optional<CertificateEntity> certificate = certificateService.getCertificateByUsername(request.getUsername());
+            CertificateEntity certificate = certificateService.getCertificateByUsername(request.getUsername());
 
-            if (certificate.isPresent() && CertificationCenterService.verifyCertificate(certificate.get().getPublicKey())) {
+            if (CertificationCenterService.verifyCertificate(certificate.getPublicKey())) {
                 String jwtToken = certificationCenterService.generateJwtToken(request.getUsername());
                 return ResponseEntity.ok("JWT Token created successfully: " + jwtToken);
             } else {
@@ -41,8 +38,7 @@ public class CertificateController {
 
     @GetMapping("/{username}")
     public ResponseEntity<String> getCertificate(@PathVariable String username) {
-        Optional<CertificateEntity> certificate = certificateService.getCertificateByUsername(username);
-        return certificate.map(cert -> ResponseEntity.ok("Public Key: " + cert.getPublicKey()))
-                .orElse(ResponseEntity.notFound().build());
+        CertificateEntity certificate = certificateService.getCertificateByUsername(username);
+        return ResponseEntity.ok("Public Key: " + certificate.getPublicKey());
     }
 }

@@ -3,7 +3,6 @@ package com.example.certificates;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -74,29 +68,29 @@ public class CertificationCenterService {
             return false;
         }
     }
-    private Algorithm getAlgorithm() {
-        return Algorithm.HMAC256(jwtSecret);
-    }
 
     public String generateJwtToken(String username) throws UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException {
-            PrivateKey privateKey = getPrivateKey();
-            return JWT.create()
-                    .withSubject(username)
-                    .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                    .sign(Algorithm.RSA256((RSAPublicKey) getPublicKey(), (RSAPrivateKey) privateKey));
+        PrivateKey privateKey = getPrivateKey();
+        return JWT.create()
+                .withSubject(username)
+                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                .sign(Algorithm.RSA256((RSAPublicKey) getPublicKey(), (RSAPrivateKey) privateKey));
+    }
 
-    public static boolean verifyCertificate(String publicKeyString) {
-        try {
-            FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
-            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
+        public static boolean verifyCertificate (String publicKeyString){
+            try {
+                FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
+                CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+                X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
 
-            PublicKey publicKeyFromCert = certificate.getPublicKey();
+                PublicKey publicKeyFromCert = certificate.getPublicKey();
 
-            return publicKeyFromCert.toString().equals(publicKeyString);
-        } catch (Exception e) {
-            log.error("Certificate verification failed", e);
-            return false;
+                return publicKeyFromCert.toString().equals(publicKeyString);
+            } catch (Exception e) {
+                log.error("Certificate verification failed", e);
+                return false;
+
+            }
         }
     }
-}
+

@@ -2,8 +2,6 @@ package com.example.certificates;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
-
 public interface CertificateRepository extends JpaRepository<CertificateEntity, Long> {
-    Optional<CertificateEntity> findByUsername(String username);
+    CertificateEntity findByUsername(String username);
 }
