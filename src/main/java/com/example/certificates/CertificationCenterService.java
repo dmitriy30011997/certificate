@@ -1,5 +1,7 @@
 package com.example.certificates;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +13,18 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.*;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 
 @Service
@@ -65,20 +74,17 @@ public class CertificationCenterService {
             return false;
         }
     }
-
-    public String generateJwtToken(String username) {
-        try {
-            PrivateKey privateKey = getPrivateKey();
-            return Jwts.builder()
-                    .setSubject(username)
-                    .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hour
-                    .signWith(privateKey, SignatureAlgorithm.RS256)
-                    .compact();
-        } catch (Exception e) {
-            log.error("Failed to generate JWT token", e);
-            return null;
-        }
+    private Algorithm getAlgorithm() {
+        return Algorithm.HMAC256(jwtSecret);
     }
+
+    public String generateJwtToken(String username) throws UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException {
+            PrivateKey privateKey = getPrivateKey();
+            return JWT.create()
+                    .withSubject(username)
+                    .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
+                    .sign(Algorithm.RSA256((RSAPublicKey) getPublicKey(), (RSAPrivateKey) privateKey));
+
     public static boolean verifyCertificate(String publicKeyString) {
         try {
             FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
