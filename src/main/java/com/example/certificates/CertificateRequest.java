@@ -9,5 +9,4 @@ public class CertificateRequest {
 
     private String username;
     private String publicKey;
-    private String signature;
 }

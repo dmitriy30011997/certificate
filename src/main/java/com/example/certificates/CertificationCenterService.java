@@ -1,22 +1,18 @@
 package com.example.certificates;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -37,27 +33,22 @@ public class CertificationCenterService {
     @Value("${alias}")
     private String alias;
 
-    private PrivateKey PrivateKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
+    @SneakyThrows
+    private PrivateKey privateKey() {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        try (InputStream inputStream = keystoreResource.getInputStream()) {
-            keyStore.load(inputStream, keystorePassword.toCharArray());
-        }
+        InputStream inputStream = keystoreResource.getInputStream();
+        keyStore.load(inputStream, keystorePassword.toCharArray());
+
         return (PrivateKey) keyStore.getKey(alias, keystorePassword.toCharArray());
     }
 
-    public PrivateKey getPrivateKey() throws UnrecoverableKeyException, CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException {
-        return PrivateKey();
-    }
 
-    public PublicKey getPublicKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        return PublicKey();
-    }
-
-    private PublicKey PublicKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
+    @SneakyThrows
+    public PublicKey publicKey() {
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        try (InputStream inputStream = keystoreResource.getInputStream()) {
-            keyStore.load(inputStream, keystorePassword.toCharArray());
-        }
+        InputStream inputStream = keystoreResource.getInputStream();
+        keyStore.load(inputStream, keystorePassword.toCharArray());
+
         Certificate certificate = keyStore.getCertificate(alias);
         return certificate.getPublicKey();
     }
@@ -74,7 +65,6 @@ public class CertificationCenterService {
         } catch (Exception e) {
             log.error("Certificate verification failed", e);
             return false;
-
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.certificates;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ public class CertificateController {
 
     private final TokenService tokenService;
 
+    @SneakyThrows
     @PostMapping
     public ResponseEntity<String> createToken(CertificateRequest request) {
         return tokenService.createToken(request);
