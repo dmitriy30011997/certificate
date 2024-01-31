@@ -8,7 +8,6 @@ import lombok.Setter;
 public class CertificateRequest {
 
     private String username;
-    private String encryptedPublicKey;
     private String publicKey;
     private String signature;
 }

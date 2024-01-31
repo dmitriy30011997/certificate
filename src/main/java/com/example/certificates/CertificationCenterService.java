@@ -3,8 +3,8 @@ package com.example.certificates;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,7 @@ import java.util.Date;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CertificationCenterService {
 
     private final CertificateService certificateService;
@@ -36,17 +37,12 @@ public class CertificationCenterService {
     @Value("${certificateFilePath}")
     private static String certificateFilePath;
 
-    @Autowired
-    public CertificationCenterService(CertificateService certificateService) {
-        this.certificateService = certificateService;
-    }
-
     private PrivateKey getPrivateKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException, UnrecoverableKeyException {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         try (InputStream inputStream = keystoreResource.getInputStream()) {
             keyStore.load(inputStream, keystorePassword.toCharArray());
         }
-        return (PrivateKey) keyStore.getKey("privateKeyAlias", keystorePassword.toCharArray());
+        return (PrivateKey) keyStore.getKey("mykey", keystorePassword.toCharArray());
     }
 
     private PublicKey getPublicKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
@@ -54,7 +50,7 @@ public class CertificationCenterService {
         try (InputStream inputStream = keystoreResource.getInputStream()) {
             keyStore.load(inputStream, keystorePassword.toCharArray());
         }
-        Certificate certificate = keyStore.getCertificate("publicKeyAlias");
+        Certificate certificate = keyStore.getCertificate("mykey");
         return certificate.getPublicKey();
     }
 
@@ -77,20 +73,20 @@ public class CertificationCenterService {
                 .sign(Algorithm.RSA256((RSAPublicKey) getPublicKey(), (RSAPrivateKey) privateKey));
     }
 
-        public static boolean verifyCertificate (String publicKeyString){
-            try {
-                FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
-                CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-                X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
+    public static boolean verifyCertificate(String publicKeyString) {
+        try {
+            FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
 
-                PublicKey publicKeyFromCert = certificate.getPublicKey();
+            PublicKey publicKeyFromCert = certificate.getPublicKey();
 
-                return publicKeyFromCert.toString().equals(publicKeyString);
-            } catch (Exception e) {
-                log.error("Certificate verification failed", e);
-                return false;
+            return publicKeyFromCert.toString().equals(publicKeyString);
+        } catch (Exception e) {
+            log.error("Certificate verification failed", e);
+            return false;
 
-            }
         }
     }
+}
 
