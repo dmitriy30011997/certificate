@@ -54,7 +54,7 @@ public class CertificationCenterService {
     }
 
     private PublicKey PublicKey() throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        KeyStore keyStore = KeyStore.getInstance("JKS");
         try (InputStream inputStream = keystoreResource.getInputStream()) {
             keyStore.load(inputStream, keystorePassword.toCharArray());
         }
