@@ -6,11 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.security.cert.CertificateException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
@@ -22,7 +18,7 @@ public class TokenService {
 
     private final CertificationCenterService certificationCenterService;
 
-    public String createToken(CertificateRequest request) throws CertificateException, KeyStoreException, NoSuchAlgorithmException, IOException {
+    public String createToken(CertificateRequest request) {
         return generateJwtToken(request.getUsername());
         }
     public boolean verifyJwtToken(String token) {
