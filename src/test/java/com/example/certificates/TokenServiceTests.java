@@ -6,6 +6,8 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,33 +23,39 @@ class TokenServiceTests {
     @InjectMocks
     private TokenService tokenService;
 
+
     @Test
     void testVerifyJwtToken_Positive() {
-        String fakeToken = "fakeToken";
+        KeyPair keyPair = MockDataHelper.createMockKeyPair();
+        PrivateKey privateKey = keyPair.getPrivate();
+        PublicKey publicKey = keyPair.getPublic();
 
-        PublicKey publicKey = MockDataHelper.createMockPublicKey();
+        when(certificationCenterService.privateKey()).thenReturn(privateKey);
         when(certificationCenterService.publicKey()).thenReturn(publicKey);
-        when(tokenService.verifyJwtToken(fakeToken)).thenCallRealMethod();
 
-        boolean result = tokenService.verifyJwtToken(fakeToken);
+        String tok = tokenService.generateJwtToken("testUser");
 
+        boolean result = tokenService.verifyJwtToken(tok);
         assertTrue(result);
     }
 
     @Test
     void testVerifyJwtToken_Negative() {
-        String fakeToken = "fakeToken";
-
         PublicKey publicKey = MockDataHelper.createMockPublicKey();
+        PrivateKey privateKey = MockDataHelper.createMockPrivateKey();
+
+        when(certificationCenterService.privateKey()).thenReturn(privateKey);
         when(certificationCenterService.publicKey()).thenReturn(publicKey);
-        when(tokenService.verifyJwtToken(fakeToken)).thenCallRealMethod();
 
-        fakeToken = fakeToken + "modified";
+        String tok = tokenService.generateJwtToken("testUser");
 
-        boolean result = tokenService.verifyJwtToken(fakeToken);
+        when(certificationCenterService.publicKey()).thenReturn(MockDataHelper.createMockPublicKey());
+        when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
 
+        boolean result = tokenService.verifyJwtToken(tok);
         assertFalse(result);
     }
+
 
     @Test
     void testGenerateJwtToken() {
