@@ -35,6 +35,6 @@ public class TokenService {
         return JWT.create()
                 .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                .sign(Algorithm.RSA256(null, (RSAPrivateKey) certificationCenterService.privateKey()));
+                .sign(Algorithm.RSA256((RSAPrivateKey) certificationCenterService.privateKey()));
     }
 }

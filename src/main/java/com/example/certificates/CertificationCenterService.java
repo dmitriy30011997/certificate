@@ -19,12 +19,12 @@ import java.security.cert.X509Certificate;
 @RequiredArgsConstructor
 public class CertificationCenterService {
 
-    private String keystoreResource = "C:\\Users\\dmitr\\IdeaProjects\\sertificates\\src\\keystore.jks";
+    private final String keystoreResource = "src/keystore.jks";
 
     @Value("${keystore.password}")
     private String keystorePassword;
 
-    private static String certificateFilePath = "src/main/resources/certificate.crt";
+    private static final String certificateFilePath = "src/certificate.crt";
 
     @Value("${alias}")
     private String alias;
