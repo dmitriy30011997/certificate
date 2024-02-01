@@ -30,7 +30,7 @@ public class CertificationCenterService {
     private String alias;
 
     @SneakyThrows
-    PrivateKey privateKey() {
+    PrivateKey getPrivateKey() {
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(new FileInputStream(KEYSTORE_RESOURCE), keystorePassword.toCharArray());
 
@@ -39,7 +39,7 @@ public class CertificationCenterService {
 
 
     @SneakyThrows
-    public PublicKey publicKey() {
+    public PublicKey getPublicKey() {
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(new FileInputStream(KEYSTORE_RESOURCE), keystorePassword.toCharArray());
 

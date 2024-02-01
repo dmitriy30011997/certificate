@@ -30,8 +30,8 @@ class TokenServiceTests {
         PrivateKey privateKey = keyPair.getPrivate();
         PublicKey publicKey = keyPair.getPublic();
 
-        when(certificationCenterService.privateKey()).thenReturn(privateKey);
-        when(certificationCenterService.publicKey()).thenReturn(publicKey);
+        when(certificationCenterService.getPrivateKey()).thenReturn(privateKey);
+        when(certificationCenterService.getPublicKey()).thenReturn(publicKey);
 
         String tok = tokenService.generateJwtToken(username);
 
@@ -44,13 +44,13 @@ class TokenServiceTests {
         PublicKey publicKey = MockDataHelper.createMockPublicKey();
         PrivateKey privateKey = MockDataHelper.createMockPrivateKey();
 
-        when(certificationCenterService.privateKey()).thenReturn(privateKey);
-        when(certificationCenterService.publicKey()).thenReturn(publicKey);
+        when(certificationCenterService.getPrivateKey()).thenReturn(privateKey);
+        when(certificationCenterService.getPublicKey()).thenReturn(publicKey);
 
         String tok = tokenService.generateJwtToken(username);
 
-        when(certificationCenterService.publicKey()).thenReturn(MockDataHelper.createMockPublicKey());
-        when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
+        when(certificationCenterService.getPublicKey()).thenReturn(MockDataHelper.createMockPublicKey());
+        when(certificationCenterService.getPrivateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
 
         boolean result = tokenService.verifyJwtToken(tok);
         assertFalse(result);
@@ -59,7 +59,7 @@ class TokenServiceTests {
 
     @Test
     void testGenerateJwtToken() {
-        when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
+        when(certificationCenterService.getPrivateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
         String token = tokenService.generateJwtToken(username);
 
         assertNotNull(token);

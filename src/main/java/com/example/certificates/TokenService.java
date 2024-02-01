@@ -24,7 +24,7 @@ public class TokenService {
 
     public boolean verifyJwtToken(String token) {
         try {
-            PublicKey publicKey = certificationCenterService.publicKey();
+            PublicKey publicKey = certificationCenterService.getPublicKey();
             JWT.require(Algorithm.RSA256((RSAPublicKey) publicKey)).build().verify(token);
             return true;
         } catch (Exception e) {
@@ -37,6 +37,6 @@ public class TokenService {
         return JWT.create()
                 .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 60 * 1000))
-                .sign(Algorithm.RSA256((RSAPrivateKey) certificationCenterService.privateKey()));
+                .sign(Algorithm.RSA256((RSAPrivateKey) certificationCenterService.getPrivateKey()));
     }
 }
