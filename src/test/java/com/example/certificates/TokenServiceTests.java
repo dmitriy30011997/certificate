@@ -5,11 +5,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -22,7 +20,7 @@ class TokenServiceTests {
 
     @InjectMocks
     private TokenService tokenService;
-
+    String username = "testUser";
 
     @Test
     void testVerifyJwtToken_Positive() {
@@ -33,7 +31,7 @@ class TokenServiceTests {
         when(certificationCenterService.privateKey()).thenReturn(privateKey);
         when(certificationCenterService.publicKey()).thenReturn(publicKey);
 
-        String tok = tokenService.generateJwtToken("testUser");
+        String tok = tokenService.generateJwtToken(username);
 
         boolean result = tokenService.verifyJwtToken(tok);
         assertTrue(result);
@@ -47,7 +45,7 @@ class TokenServiceTests {
         when(certificationCenterService.privateKey()).thenReturn(privateKey);
         when(certificationCenterService.publicKey()).thenReturn(publicKey);
 
-        String tok = tokenService.generateJwtToken("testUser");
+        String tok = tokenService.generateJwtToken(username);
 
         when(certificationCenterService.publicKey()).thenReturn(MockDataHelper.createMockPublicKey());
         when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
@@ -59,8 +57,6 @@ class TokenServiceTests {
 
     @Test
     void testGenerateJwtToken() {
-        String username = "testUser";
-
         when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
         String token = tokenService.generateJwtToken(username);
 

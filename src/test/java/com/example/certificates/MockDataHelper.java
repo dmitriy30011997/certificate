@@ -11,8 +11,6 @@ import java.security.PublicKey;
 import static org.mockito.Mockito.when;
 
 public class MockDataHelper {
-    CertificationCenterService certificationCenterService;
-
     @SneakyThrows
     public static PrivateKey createMockPrivateKey() {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -33,8 +31,7 @@ public class MockDataHelper {
     public static KeyPair createMockKeyPair() {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
-        KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        return keyPair;
+        return keyPairGenerator.generateKeyPair();
     }
     public static CertificateRequest createMockCertificateRequest() {
         CertificateRequest request = Mockito.mock(CertificateRequest.class);
