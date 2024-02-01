@@ -19,12 +19,12 @@ import java.security.cert.X509Certificate;
 @RequiredArgsConstructor
 public class CertificationCenterService {
 
-    private final String keystoreResource = "src/keystore.jks";
+    private static final String KEYSTORE_RESOURCE = "src/keystore.jks";
 
-    @Value("${keystore.password}")
+    @Value("${keystore.password:defaultPassword}")
     private String keystorePassword;
 
-    private static final String certificateFilePath = "src/certificate.crt";
+    private static final String CERTIFICATE_FILE_PATH = "src/certificate.crt";
 
     @Value("${alias}")
     private String alias;
@@ -32,7 +32,7 @@ public class CertificationCenterService {
     @SneakyThrows
     PrivateKey privateKey() {
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(new FileInputStream(keystoreResource), keystorePassword.toCharArray());
+        keyStore.load(new FileInputStream(KEYSTORE_RESOURCE), keystorePassword.toCharArray());
 
         return (PrivateKey) keyStore.getKey(alias, keystorePassword.toCharArray());
     }
@@ -41,7 +41,7 @@ public class CertificationCenterService {
     @SneakyThrows
     public PublicKey publicKey() {
         KeyStore keyStore = KeyStore.getInstance("JKS");
-        keyStore.load(new FileInputStream(keystoreResource), keystorePassword.toCharArray());
+        keyStore.load(new FileInputStream(KEYSTORE_RESOURCE), keystorePassword.toCharArray());
 
         Certificate certificate = keyStore.getCertificate(alias);
         return certificate.getPublicKey();
@@ -49,7 +49,7 @@ public class CertificationCenterService {
 
     public static boolean verifyCertificate(String publicKeyString) {
         try {
-            FileInputStream fileInputStream = new FileInputStream(certificateFilePath);
+            FileInputStream fileInputStream = new FileInputStream(CERTIFICATE_FILE_PATH);
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             X509Certificate certificate = (X509Certificate) certificateFactory.generateCertificate(fileInputStream);
 

@@ -20,7 +20,8 @@ public class TokenService {
 
     public String createToken(CertificateRequest request) {
         return generateJwtToken(request.getUsername());
-        }
+    }
+
     public boolean verifyJwtToken(String token) {
         try {
             PublicKey publicKey = certificationCenterService.publicKey();
@@ -31,6 +32,7 @@ public class TokenService {
             return false;
         }
     }
+
     public String generateJwtToken(String username) {
         return JWT.create()
                 .withSubject(username)
