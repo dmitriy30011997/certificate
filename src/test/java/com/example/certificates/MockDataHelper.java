@@ -33,6 +33,7 @@ public class MockDataHelper {
         keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
+
     public static CertificateRequest createMockCertificateRequest() {
         CertificateRequest request = Mockito.mock(CertificateRequest.class);
         when(request.getUsername()).thenReturn("testUser");
