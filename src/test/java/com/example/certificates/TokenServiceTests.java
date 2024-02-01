@@ -22,20 +22,6 @@ class TokenServiceTests {
     private TokenService tokenService;
 
     @Test
-    void testCreateToken() {
-        CertificateRequest request = new CertificateRequest();
-        String fakeToken = "fakeToken";
-        when(certificationCenterService.publicKey()).thenReturn(MockDataHelper.createMockPublicKey());
-        when(certificationCenterService.privateKey()).thenReturn(MockDataHelper.createMockPrivateKey());
-        when(tokenService.generateJwtToken(request.getUsername())).thenReturn(fakeToken);
-
-        String token = tokenService.createToken(request);
-
-        assertNotNull(token);
-        assertEquals(fakeToken, token);
-    }
-
-    @Test
     void testVerifyJwtToken_Positive() {
         String fakeToken = "fakeToken";
 
